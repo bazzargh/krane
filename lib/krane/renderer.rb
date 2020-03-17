@@ -43,7 +43,7 @@ module Krane
       err.filename = "#{err.filename} (partial included from: #{err.parents.join(' -> ')})"
       raise err
     rescue StandardError => err
-      raise InvalidTemplateError.new(err.message, filename: filename, content: raw_template)
+      raise InvalidTemplateError.new(err.message, filename: filename, content: raw_template), err.message, err.backtrace
     end
 
     def render_partial(partial, locals)
@@ -66,12 +66,12 @@ module Krane
     rescue PartialNotFound => err
       # get the filename from the first parent, not the missing partial itself
       raise err if err.filename == partial
-      raise InvalidPartialError.new(err.message, filename: partial, content: expanded_template || template)
+      raise InvalidPartialError.new(err.message, filename: partial, content: expanded_template || template), err.message, err.backtrace
     rescue InvalidPartialError => err
       err.parents = err.parents.dup.unshift(File.basename(partial_path))
       raise err
     rescue StandardError => err
-      raise InvalidPartialError.new(err.message, filename: partial_path, content: expanded_template || template)
+      raise InvalidPartialError.new(err.message, filename: partial_path, content: expanded_template || template), err.message, err.backtrace
     end
 
     private

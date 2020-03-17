@@ -108,9 +108,11 @@ module Krane
       @logger.error("Failed to render #{exception.filename}")
 
       debug_msg = ColorizedString.new("Invalid template: #{exception.filename}\n").red
-      debug_msg += "> Error message:\n#{FormattedLogger.indent_four(exception.to_s)}"
+      debug_msg += "> Error message:\n#{FormattedLogger.indent_four(exception.to_s)}\n"
+      debug_msg += "> Stacktrace:\n#{FormattedLogger.indent_four(exception.backtrace.join("\n"))}"
       if exception.content
-        debug_msg += "\n> Template content:\n#{FormattedLogger.indent_four(exception.content)}"
+        numbered = exception.content.lines.map.with_index {|item, index| sprintf("% 4d: %s", index + 1, item)}
+        debug_msg += "\n> Template content:\n#{FormattedLogger.indent_four(numbered).join("")}"
       end
       @logger.summary.add_paragraph(debug_msg)
     end
